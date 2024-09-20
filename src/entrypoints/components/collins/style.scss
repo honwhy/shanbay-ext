@@ -1,0 +1,30 @@
+@use "sass:color";
+
+.mean-container {
+    text-align: left;
+    &:not(:first-child) {
+        margin-top: 15px;
+    }
+  }
+  .mean{
+    display: inline-flex;
+  }
+  .mean-text {
+    :deep(p) {
+      text-align: left;
+    }
+    :deep(b) {
+      color: #28bea0;
+    }
+  }
+  .examples {
+    margin-left: 10px;
+    margin-top: 10px;
+    padding: 10px;
+    background-color:  color.adjust(#b0b4be, $lightness: 20%);
+  }
+  .collins-trans {
+    p {
+        text-align: left;
+    }
+  }

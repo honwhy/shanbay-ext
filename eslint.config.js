@@ -37,4 +37,10 @@ export default antfu(
       'tailwind.config.js',
     ],
   }),
+  {
+    rules: {
+      'no-console': 'off',
+      'no-useless-catch': 'off',
+    },
+  },
 )
