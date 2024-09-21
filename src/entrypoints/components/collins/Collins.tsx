@@ -1,3 +1,4 @@
+import { ExAction } from '@/entrypoints/types'
 import { isEmpty } from 'lodash-es'
 import React, { useEffect, useState } from 'react'
 
@@ -36,7 +37,7 @@ const CollinsReact: React.FC = () => {
     if (wordElement == null)
       return
     const word = wordElement.textContent
-    browser.runtime.sendMessage(null, { action: 'collins', word }).then((res: string) => {
+    browser.runtime.sendMessage(null, { action: ExAction.Collins, word }).then((res: string) => {
       // console.log('collins res', res)
       const data = parseData(res) || []
       setExplainList(data)
