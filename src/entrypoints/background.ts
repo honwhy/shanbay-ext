@@ -10,6 +10,8 @@ export default defineBackground(() => {
     switch (req.action) {
       case ExAction.Collins:
         return youdaoQuery(req)
+      case ExAction.GetAuthInfo:
+        return getAuthInfo()
     }
     return true
   })
@@ -26,4 +28,9 @@ async function youdaoQuery(req: ExMessage) {
     console.error('collins error', e)
     return null
   }
+}
+
+async function getAuthInfo() {
+  const result = await browser.cookies.getAll({ domain: 'shanbay.com', name: 'auth_token' })
+  return result[0]
 }

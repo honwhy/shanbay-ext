@@ -10,7 +10,10 @@ export default defineConfig({
     ],
     minimum_chrome_version: '88',
     name: '扇贝单词助手V3',
-    permissions: [],
+    permissions: [
+      'cookies',
+      'storage',
+    ],
   },
   modules: ['@wxt-dev/module-react'],
   srcDir: 'src',
