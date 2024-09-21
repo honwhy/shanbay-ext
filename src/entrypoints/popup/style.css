@@ -1,0 +1,39 @@
+body {
+    font-family: "PingFangSC-Light", "Helvetica Neue", Helvetica, "Microsoft YaHei", "微软雅黑", Arial, SimHei, serif;
+    margin: 0;
+    text-align: center;
+    word-break: keep-all;
+    padding: 5px 10px 16px;
+}
+ul {
+    padding: 0;
+    margin: 0;
+}
+
+li {
+    list-style-type: none;
+    white-space: nowrap;
+    margin: 10px 0;
+}
+
+button {
+    background: #209e85;
+    padding: 0;
+    border-radius: 4px;
+    border: none;
+    width: 90px;
+    height:26px;
+    color: #fff;
+    user-select: none;
+    outline: none;
+    cursor: pointer;
+}
+#header img {
+    width: 40px;
+    height:40px;
+    vertical-align: top;
+    border: 1px solid #000;
+}
+.hide {
+    display: none;
+}
