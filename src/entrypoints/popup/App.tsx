@@ -29,6 +29,9 @@ function App() {
   const handleLogin = () => {
     browser.tabs.create({ url: 'https://web.shanbay.com/web/account/login/' })
   }
+  const handleOptions = () => {
+    browser.runtime.openOptionsPage()
+  }
   return (
     <div>
       <h2>扇贝查词插件</h2>
@@ -39,7 +42,7 @@ function App() {
           <>
             <li><button id="batch-add" onClick={handleBatchAdd}>批量添加单词</button></li>
             <li><button id="begin-learning" onClick={handleBeginLearning}>开始背单词</button></li>
-            <li><button id="options">插件设置</button></li>
+            <li><button id="options" onClick={handleOptions}>插件设置</button></li>
             <li><button id="logout">退出</button></li>
           </>
         )}
