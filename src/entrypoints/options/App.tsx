@@ -22,7 +22,7 @@ async function getDefaultValues() {
   }
 }
 function App() {
-  const { formState, handleSubmit, register } = useForm<ExSettings>({
+  const { formState: { errors, isSubmitting }, handleSubmit, register } = useForm<ExSettings>({
     defaultValues: () => getDefaultValues(),
   })
   const onSubmit = useCallback((data: ExSettings) => {
@@ -142,19 +142,34 @@ function App() {
               </ul>
               <label>
                 <textarea
+                  className="p-1"
                   placeholder="只添加域名，如：baidu.com，多个域名用回车分割"
                   rows={10}
                   style={{ width: '95%' }}
-                  {...register('ignoreSites', { setValueAs: value => value || '少壮不努力，老大背单词' })}
+                  {...register('ignoreSites', { validate: (value) => {
+                    const sites = value as string
+                    if (sites && sites.length > 0) {
+                      const result = sites.split('\n').every((site) => {
+                        return site.trim().match(/^([\w-]+\.){1,2}\w+$/)
+                      })
+                      if (result) {
+                        return result
+                      }
+                      return '屏蔽站点格式不正确'
+                    }
+                  } })}
                 >
                 </textarea>
+                {errors.ignoreSites && (
+                  <p className="text-red-500" role="alert">{errors.ignoreSites.message}</p>
+                )}
               </label>
             </div>
           </li>
         </ul>
 
         <div id="saveP">
-          <button disabled={formState.isSubmitting} id="save" type="submit">保存</button>
+          <button disabled={isSubmitting} id="save" type="submit">保存</button>
         </div>
       </form>
       <hr />
