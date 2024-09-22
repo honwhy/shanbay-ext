@@ -1,10 +1,37 @@
-import { Button } from '@/components/ui/button'
-import { useEffect, useState } from 'react'
+import { isEmpty, isString, set } from 'lodash-es'
+import { useForm } from 'react-hook-form'
 
-import { ExAction } from '../types'
+import type { ExSettings } from '../types'
+
+import { defaultIgnoreSites, extensionSpecification } from '../constants'
+import { debugLogger } from '../utils'
 import './style.css'
 
+async function getDefaultValues() {
+  const settings = await storage.getItem<ExSettings>(`local:__shanbayExtensionSettings`)
+  debugLogger('log', '__shanbayExtensionSettings: ', settings)
+  if (isEmpty(settings)) {
+    return {
+      ...extensionSpecification,
+      ignoreSites: defaultIgnoreSites.join('\n'),
+    }
+  }
+  return {
+    ...settings,
+    ignoreSites: (settings.ignoreSites as string[]).join('\n'),
+  }
+}
 function App() {
+  const { formState, handleSubmit, register } = useForm<ExSettings>({
+    defaultValues: () => getDefaultValues(),
+  })
+  const onSubmit = useCallback((data: ExSettings) => {
+    debugLogger('log', 'onSubmit: ', data)
+    if (isString(data.ignoreSites)) {
+      data.ignoreSites = data.ignoreSites.split('\n')
+    }
+    storage.setItem<ExSettings>(`local:__shanbayExtensionSettings`, data)
+  }, [])
   return (
     <div id="main">
       <header>
@@ -16,119 +43,132 @@ function App() {
           <p>保存成功</p>
         </div>
       </div>
-      <ul>
-        <li>
-          <h3>1, 双击查词</h3>
-          <p>
-            <label>
-              <input checked name="clickLookup" type="radio" value="true" />
-              是
-              <input name="clickLookup" type="radio" value="false" />
-              否
-            </label>
-          </p>
-          <h3>2, 右键菜单查词(重启Chrome才能生效)</h3>
-          <p>
-            <label>
-              <input checked name="contextLookup" type="radio" value="true" />
-              是
-              <input name="contextLookup" type="radio" value="false" />
-              否
-            </label>
-          </p>
-        </li>
-        <li>
-          <h3>默认加入生词库</h3>
-          <p>
-            <label>
-              <input name="addBook" type="radio" value="true" />
-              是
-              <input checked name="addBook" type="radio" value="false" />
-              否
-            </label>
-          </p>
-        </li>
-        <li>
-          <h3>显示例句按钮</h3>
-          <p>
-            <label>
-              <input name="exampleSentence" type="radio" value="true" />
-              是
-              <input checked name="exampleSentence" type="radio" value="false" />
-              否
-            </label>
-          </p>
-        </li>
-        <li>
-          <h3>
-            开启背单词定时提醒(每3小时)
-            <i>请注意操作系统是不是关闭了浏览器的通知</i>
-          </h3>
-          <p>
-            <label>
-              <input checked name="alarm" type="radio" value="true" />
-              是
-              <input name="alarm" type="radio" value="false" />
-              否
-            </label>
-          </p>
-          <p>
-            <strong>提醒内容定制: </strong>
-            <input name="reminderContent" type="text" value="少壮不努力，老大背单词" />
-          </p>
-        </li>
-        <li>
-          <h3>默认发音</h3>
-          <p className="select">
-            <select name="autoRead">
-              <option value="us">美音</option>
-              <option value="en">英音</option>
-              <option selected value="false">关闭</option>
-            </select>
-          </p>
-        </li>
-        <li>
-          <h3>释义</h3>
-          <p className="select">
-            <select name="paraphrase">
-              <option value="Chinese">只显示中文释义</option>
-              <option value="English">只显示英文释义</option>
-              <option selected value="bilingual">显示双语释义</option>
-            </select>
-          </p>
-        </li>
-        <li>
-          <h3>屏蔽站点</h3>
-          <div>
+      <form onSubmit={handleSubmit(onSubmit)}>
+        <ul>
+          <li>
+            <h3>1, 双击查词</h3>
             <p>
-              避免
-              <a href="https://github.com/maicss/chrome-shanbay-v2#%E5%B7%B2%E7%9F%A5%E7%9A%84%E9%97%AE%E9%A2%98">已知问题</a>
-              的影响，可以把某些站点列入屏蔽站点。默认屏蔽站点：
+              <label>
+                <input type="radio" value="true" {...register('clickLookup')} />
+                是
+                <input type="radio" value="false" {...register('clickLookup')} />
+                否
+              </label>
             </p>
-            <ul className="ignore-sites"></ul>
-            <label>
-              <textarea name="ignoreSites" placeholder="只添加域名，如：baidu.com，多个域名用回车分割" rows="10" style={{ width: '95%' }}></textarea>
-            </label>
-          </div>
-        </li>
-      </ul>
+            <h3>2, 右键菜单查词(重启Chrome才能生效)</h3>
+            <p>
+              <label>
+                <input type="radio" value="true" {...register('contextLookup')} />
+                是
+                <input type="radio" value="false" {...register('contextLookup')} />
+                否
+              </label>
+            </p>
+          </li>
+          <li>
+            <h3>默认加入生词库</h3>
+            <p>
+              <label>
+                <input type="radio" value="true" {...register('addBook')} />
+                是
+                <input type="radio" value="false" {...register('addBook')} />
+                否
+              </label>
+            </p>
+          </li>
+          <li>
+            <h3>显示例句按钮</h3>
+            <p>
+              <label>
+                <input type="radio" value="true" {...register('exampleSentence')} />
+                是
+                <input type="radio" value="false" {...register('exampleSentence')} />
+                否
+              </label>
+            </p>
+          </li>
+          <li>
+            <h3>
+              开启背单词定时提醒(每3小时)
+              <i>请注意操作系统是不是关闭了浏览器的通知</i>
+            </h3>
+            <p>
+              <label>
+                <input type="radio" value="true" {...register('alarm')} />
+                是
+                <input type="radio" value="false" {...register('alarm')} />
+                否
+              </label>
+            </p>
+            <p>
+              <strong>提醒内容定制: </strong>
+              <input placeholder="少壮不努力，老大背单词" type="text" {...register('reminderContent')} />
+            </p>
+          </li>
+          <li>
+            <h3>默认发音</h3>
+            <p className="select">
+              <select {...register('autoRead')}>
+                <option value="us">美音</option>
+                <option value="en">英音</option>
+                <option value="false">关闭</option>
+              </select>
+            </p>
+          </li>
+          <li>
+            <h3>释义</h3>
+            <p className="select">
+              <select {...register('paraphrase')}>
+                <option value="Chinese">只显示中文释义</option>
+                <option value="English">只显示英文释义</option>
+                <option value="bilingual">显示双语释义</option>
+              </select>
+            </p>
+          </li>
+          <li>
+            <h3>屏蔽站点</h3>
+            <div>
+              <p>
+                避免
+                <a href="https://github.com/maicss/chrome-shanbay-v2#%E5%B7%B2%E7%9F%A5%E7%9A%84%E9%97%AE%E9%A2%98">已知问题</a>
+                的影响，可以把某些站点列入屏蔽站点。默认屏蔽站点：
+              </p>
+              <ul className="ignore-sites">
+                {
+                  defaultIgnoreSites.map(site => (
+                    <li key={site}>{site}</li>),
+                  )
+                }
+              </ul>
+              <label>
+                <textarea
+                  placeholder="只添加域名，如：baidu.com，多个域名用回车分割"
+                  rows={10}
+                  style={{ width: '95%' }}
+                  {...register('ignoreSites', { setValueAs: value => value || '少壮不努力，老大背单词' })}
+                >
+                </textarea>
+              </label>
+            </div>
+          </li>
+        </ul>
 
-      <div id="saveP">
-        <button id="save">保存</button>
-      </div>
-
+        <div id="saveP">
+          <button disabled={formState.isSubmitting} id="save" type="submit">保存</button>
+        </div>
+      </form>
       <hr />
       <details>
         <summary>关于</summary>
         <p>
           这个应用是基于
-          <a href="https://github.com/jinntrance/shanbay-crx">jinntrance</a>
+          <a href="https://github.com/honwhy/chrome-shanbay-v2">jinntrance</a>
           {' '}
           的扇贝查词应用的改进版。
         </p>
         <p>
           本项目的
-          <a href="https://github.com/maicss/chrome-shanbay-v2"> GitHub</a>
+          <a href="https://github.com/honwhy/shanbay-ext"> GitHub</a>
           {' '}
           地址。感觉有帮助的话给个赞。
         </p>
@@ -149,7 +189,7 @@ function App() {
         </p>
         <p>
           2,
-          <a href="https://github.com/maicss/chrome-shanbay-v2/issues/new/choose">GitHub issue</a>
+          <a href="https://github.com/honwhy/shanbay-ext/issues/new/choose">GitHub issue</a>
         </p>
         <p>issue的内容也尽量按照上面的格式，这样方便定位问题、解决问题。</p>
         <hr />
