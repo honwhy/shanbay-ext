@@ -3,6 +3,7 @@ import { ofetch } from 'ofetch'
 import type { ExMessage } from './types'
 
 import { ExAction } from './types'
+import { debugLogger } from './utils'
 
 export default defineBackground(() => {
   browser.runtime.onMessage.addListener((req, sender, sendResponse) => {
@@ -12,6 +13,8 @@ export default defineBackground(() => {
         return youdaoQuery(req)
       case ExAction.GetAuthInfo:
         return getAuthInfo()
+      case ExAction.Lookup:
+        return lookup(req)
     }
     return true
   })
@@ -21,11 +24,10 @@ async function youdaoQuery(req: ExMessage) {
   const url = `https://dict.youdao.com/w/${req.word}`
   try {
     const data = await ofetch(url, { mode: 'no-cors', parseResponse: txt => txt })
-    // console.log('collins data', data)
     return data
   }
   catch (e) {
-    console.error('collins error', e)
+    debugLogger('error', 'youdaoQuery error', e)
     return null
   }
 }
@@ -33,4 +35,15 @@ async function youdaoQuery(req: ExMessage) {
 async function getAuthInfo() {
   const result = await browser.cookies.getAll({ domain: 'shanbay.com', name: 'auth_token' })
   return result[0]
+}
+async function lookup(req: ExMessage) {
+  const url = `https://apiv3.shanbay.com/abc/words/senses?vocabulary_content=${req.word}`
+  try {
+    const data = await ofetch(url, { credentials: 'include', mode: 'cors', parseResponse: JSON.parse })
+    return data
+  }
+  catch (e) {
+    debugLogger('error', 'lookup error', e)
+    return null
+  }
 }
