@@ -1,6 +1,6 @@
 import ReactDOM from 'react-dom/client'
 
-import App from './Popover.tsx'
+import App from './Wrapper.tsx'
 
 export async function createUi(ctx: any) {
   const ui = await createShadowRootUi(ctx, {
