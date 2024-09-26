@@ -2,6 +2,8 @@ import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover
 import { debugLogger } from '@/entrypoints/utils'
 import React, { useEffect } from 'react'
 
+import DictInfo from './DictInfo.tsx'
+
 const WrapperReact: React.FC = () => {
   const [isPopoverOpen, setIsPopoverOpen] = useState(false)
   const [selectedText, setSelectedText] = useState('')
@@ -65,7 +67,7 @@ const WrapperReact: React.FC = () => {
           <PopoverContent>
             <div className="rounded bg-white p-4 shadow-lg">
               <p>{selectedText}</p>
-              {/* 在这里添加其他内容或组件 */}
+              <DictInfo word={selectedText} />
             </div>
           </PopoverContent>
         </Popover>
