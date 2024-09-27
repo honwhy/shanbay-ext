@@ -37,3 +37,35 @@ export interface ExSettings {
   reminderContent: string
 }
 export default {}
+
+// 单词查询结果
+interface Audio {
+  ipa: string
+  name: string
+  sense_id: null | string
+  urls: string[]
+}
+
+interface Definition {
+  def: string
+  dict_id: string
+  pos: string
+  sense_id: string
+}
+
+interface Definitions {
+  cn: Definition[]
+  en: Definition[]
+  en_v2: Definition[]
+}
+
+export interface WordData {
+  audios: { uk: Audio, us: Audio }[]
+  content: string
+  definitions: Definitions
+  id: string
+  id_int: string
+  labels: number[]
+  ref_id: string
+  vocab_type: string
+}
