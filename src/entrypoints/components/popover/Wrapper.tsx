@@ -1,5 +1,6 @@
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import { debugLogger } from '@/entrypoints/utils'
+import { isEmpty } from 'lodash-es'
 import React, { useEffect } from 'react'
 
 import DictInfo from './DictInfo.tsx'
@@ -12,7 +13,12 @@ const WrapperReact: React.FC = () => {
     const selection = window.getSelection()
     if (selection && selection.rangeCount > 0) {
       const range = selection.getRangeAt(0).cloneRange()
-      setSelectedText(range.toString())
+      const rangeText = range.toString().trim()
+      if (isEmpty(rangeText)) {
+        setIsPopoverOpen(false)
+        return
+      }
+      setSelectedText(rangeText)
       setIsPopoverOpen(true)
       const rect = range.getBoundingClientRect()
       const position = {
@@ -20,6 +26,7 @@ const WrapperReact: React.FC = () => {
         top: rect.top,
       }
       debugLogger('info', 'position', position)
+      debugLogger('info', 'selectedText', rangeText)
       setPopoverPosition(position)
     }
     else {

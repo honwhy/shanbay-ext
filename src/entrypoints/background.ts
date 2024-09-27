@@ -36,6 +36,8 @@ async function getAuthInfo() {
   const result = await browser.cookies.getAll({ domain: 'shanbay.com', name: 'auth_token' })
   return result[0]
 }
+// TODO 暂不支持查询英语单词外的内容
+// TODO 后端和前端返回的code需要约定
 async function lookup(req: ExMessage) {
   const url = `https://apiv3.shanbay.com/abc/words/senses?vocabulary_content=${req.word}`
   try {
