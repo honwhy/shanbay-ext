@@ -9,7 +9,7 @@ export interface ExMessage {
 export enum ExAction {
   AddOrForget = 'AddOrForget',
   Collins = 'Collins',
-  GetAuthInfo = 'getAuthInfo',
+  GetAuthInfo = 'GetAuthInfo',
   GetWordExample = 'GetWordExample',
   Lookup = 'Lookup',
 }
