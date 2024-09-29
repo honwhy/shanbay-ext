@@ -56,7 +56,17 @@ const FetchDataComponent: React.FC<FetchDataComponentProps> = ({ word }) => {
         </span>
         <a className="check-detail" href={`https://web.shanbay.com/wordsweb/#/detail/${data?.id}`} target="_blank"> 查看详情 </a>
         <div className="phonetic-symbols">
-          {/** */}
+          {
+            data?.audios.length > 0 && data.audios[0].uk && (
+              <div key={data.audios[0].uk}>
+                <span>uk: </span>
+                <small>
+                  /
+                  {data.audios[0].uk.ipa}
+                </small>
+              </div>
+            )
+          }
         </div>
       </div>
       <div id="shanbay-content">
