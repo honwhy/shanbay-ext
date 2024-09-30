@@ -58,11 +58,12 @@ const FetchDataComponent: React.FC<FetchDataComponentProps> = ({ word }) => {
         <div className="phonetic-symbols">
           {
             data?.audios.length > 0 && data.audios[0].uk && (
-              <div key={data.audios[0].uk}>
+              <div key="uk">
                 <span>uk: </span>
                 <small>
                   /
                   {data.audios[0].uk.ipa}
+                  /
                 </small>
               </div>
             )
