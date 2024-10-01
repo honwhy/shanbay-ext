@@ -1,3 +1,4 @@
+import { debugLogger } from '@/entrypoints/utils.ts'
 import React from 'react'
 import ReactDOM from 'react-dom/client'
 
@@ -8,7 +9,7 @@ export function checking() {
   // @ts-expect-error app instance
   let root: ReactDOM.Root = null
   setInterval(() => {
-    console.log('checking')
+    debugLogger('info', 'checking')
     const container = document.querySelector('div[class^=\'CollinsTrans_container\']')
     if (isMounted) {
       if (container == null) {
@@ -20,7 +21,7 @@ export function checking() {
     if (container != null) {
       // 并且collins到期了
       if (container.textContent?.startsWith('你的柯林斯词典到期')) {
-        console.log('collins expired')
+        debugLogger('info', 'collins expired')
         root = ReactDOM.createRoot(container)
         root.render(<React.StrictMode><Collins /></React.StrictMode>)
 
@@ -28,7 +29,7 @@ export function checking() {
       }
     }
     else {
-      console.log('not mounted')
+      debugLogger('info', 'not mounted')
       root?.unmount()
       isMounted = false
     }

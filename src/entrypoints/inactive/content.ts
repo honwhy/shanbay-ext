@@ -1,4 +1,7 @@
 // Integrated - Vanilla
+
+import { debugLogger } from '../utils'
+
 // More: https://wxt.dev/guide/content-script-ui.html
 export default defineContentScript({
   main(ctx) {
@@ -10,8 +13,7 @@ export default defineContentScript({
         container.append(app)
 
         // Run js
-        // eslint-disable-next-line no-console
-        console.log('content script')
+        debugLogger('info', 'content script')
       },
       position: 'inline',
     })

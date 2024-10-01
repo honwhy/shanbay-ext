@@ -1,4 +1,5 @@
 import { ExAction } from '@/entrypoints/types'
+import { debugLogger } from '@/entrypoints/utils'
 import { isEmpty } from 'lodash-es'
 import React, { useEffect, useState } from 'react'
 
@@ -38,7 +39,7 @@ const CollinsReact: React.FC = () => {
       return
     const word = wordElement.textContent
     browser.runtime.sendMessage(null, { action: ExAction.Collins, word }).then((res: string) => {
-      // console.log('collins res', res)
+      debugLogger('info', 'collins res', res)
       const data = parseData(res) || []
       setExplainList(data)
     })

@@ -7,7 +7,7 @@ import { debugLogger } from './utils'
 
 export default defineBackground(() => {
   browser.runtime.onMessage.addListener((req, sender, sendResponse) => {
-    console.log('Received message', req, sender, sendResponse)
+    debugLogger('info', 'Received message', req, sender, sendResponse)
     switch (req.action) {
       case ExAction.Collins:
         return youdaoQuery(req)

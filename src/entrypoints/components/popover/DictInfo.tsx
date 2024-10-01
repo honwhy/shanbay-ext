@@ -6,11 +6,11 @@ import React, { useEffect, useState } from 'react'
 
 import './popover.css'
 
-interface FetchDataComponentProps {
+interface DictInfoComponentProps {
   word: string
 }
 
-const FetchDataComponent: React.FC<FetchDataComponentProps> = ({ word }) => {
+const DictInfoComponent: React.FC<DictInfoComponentProps> = ({ word }) => {
   const [data, setData] = useState<null | WordData>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<Error | null>(null)
@@ -58,7 +58,7 @@ const FetchDataComponent: React.FC<FetchDataComponentProps> = ({ word }) => {
         <div className="phonetic-symbols">
           {
             data?.audios.length > 0 && data.audios[0].uk && (
-              <div key="uk">
+              <div>
                 <span>uk: </span>
                 <small>
                   /
@@ -78,8 +78,8 @@ const FetchDataComponent: React.FC<FetchDataComponentProps> = ({ word }) => {
               <div>
                 <b>中文：</b>
                 {
-                  data.definitions.cn.map(p => (
-                    <div>
+                  data.definitions.cn.map((p, idx) => (
+                    <div key={`${p.dict_id}_${idx}`}>
                       <span style={{ color: '#333' }}>
                         {p.pos}
                         {' '}
@@ -102,4 +102,4 @@ const FetchDataComponent: React.FC<FetchDataComponentProps> = ({ word }) => {
   )
 }
 
-export default FetchDataComponent
+export default DictInfoComponent
