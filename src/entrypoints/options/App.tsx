@@ -1,3 +1,4 @@
+import { useToast } from '@/hooks/use-toast'
 import { isEmpty, isString, set } from 'lodash-es'
 import { useForm } from 'react-hook-form'
 
@@ -13,7 +14,7 @@ async function getDefaultValues() {
   if (isEmpty(settings)) {
     return {
       ...extensionSpecification,
-      ignoreSites: defaultIgnoreSites.join('\n'),
+      ignoreSites: '',
     }
   }
   return {
@@ -25,12 +26,16 @@ function App() {
   const { formState: { errors, isSubmitting }, handleSubmit, register } = useForm<ExSettings>({
     defaultValues: () => getDefaultValues(),
   })
+  const { toast } = useToast()
   const onSubmit = useCallback((data: ExSettings) => {
     debugLogger('log', 'onSubmit: ', data)
     if (isString(data.ignoreSites)) {
       data.ignoreSites = data.ignoreSites.split('\n')
     }
     storage.setItem<ExSettings>(`local:__shanbayExtensionSettings`, data)
+    toast({
+      description: '保存成功',
+    })
   }, [])
   return (
     <div id="main">
