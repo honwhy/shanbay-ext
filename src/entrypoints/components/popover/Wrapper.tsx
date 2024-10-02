@@ -14,7 +14,7 @@ const WrapperReact: React.FC = () => {
     if (selection && selection.rangeCount > 0) {
       const range = selection.getRangeAt(0).cloneRange()
       const rangeText = range.toString().trim()
-      if (isEmpty(rangeText)) {
+      if (isEmpty(rangeText) || !rangeText.match(/^[a-z\s']+$/i)) {
         setIsPopoverOpen(false)
         return
       }
