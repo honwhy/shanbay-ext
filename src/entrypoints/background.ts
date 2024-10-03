@@ -1,6 +1,6 @@
 import { ofetch } from 'ofetch'
 
-import type { ExMessage } from './types'
+import type { ExError, ExMessage } from './types'
 
 import { ExAction } from './types'
 import { debugLogger } from './utils'
@@ -36,16 +36,21 @@ async function getAuthInfo() {
   const result = await browser.cookies.getAll({ domain: 'shanbay.com', name: 'auth_token' })
   return result[0]
 }
-// TODO 暂不支持查询英语单词外的内容
+
 // TODO 后端和前端返回的code需要约定
 async function lookup(req: ExMessage) {
   const url = `https://apiv3.shanbay.com/abc/words/senses?vocabulary_content=${req.word}`
   try {
     const data = await ofetch(url, { credentials: 'include', mode: 'cors', parseResponse: JSON.parse })
-    return data
+    return { data, msg: 'success', status: 200 }
   }
   catch (e) {
     debugLogger('error', 'lookup error', e)
-    return null
+    const ee = e as ExError
+    return {
+      data: ee.data,
+      msg: ee.message,
+      status: ee.status,
+    }
   }
 }

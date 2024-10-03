@@ -1,10 +1,9 @@
-// FetchDataComponent.tsx
-import type { WordData } from '@/entrypoints/types'
+// DictInfoComponent.tsx
+import type { ExReponse, WordData } from '@/entrypoints/types'
 
 import { ExAction } from '@/entrypoints/types'
+import { debugLogger } from '@/entrypoints/utils'
 import React, { useEffect, useState } from 'react'
-
-import './popover.css'
 
 interface DictInfoComponentProps {
   word: string
@@ -13,19 +12,27 @@ interface DictInfoComponentProps {
 const DictInfoComponent: React.FC<DictInfoComponentProps> = ({ word }) => {
   const [data, setData] = useState<null | WordData>(null)
   const [loading, setLoading] = useState(true)
-  const [error, setError] = useState<Error | null>(null)
+  const [error, setError] = useState<boolean | null>(null)
 
   useEffect(() => {
     const fetchDataFromApi = async () => {
+      setLoading(true)
       try {
-        const data = await browser.runtime.sendMessage({
+        const resp = await browser.runtime.sendMessage({
           action: ExAction.Lookup,
           word,
-        })
-        setData(data as WordData)
+        }) as ExReponse
+        const { data, status } = resp
+        if (status === 200) {
+          setData(data as WordData)
+        }
+        else {
+          setError([400, 401, 403].includes(status))
+        }
       }
-      catch (error: unknown) {
-        setError(error as Error)
+      catch (e) {
+        debugLogger('error', 'lookup error', e)
+        setError(true)
       }
       finally {
         setLoading(false)
@@ -41,9 +48,9 @@ const DictInfoComponent: React.FC<DictInfoComponentProps> = ({ word }) => {
 
   if (error) {
     return (
-      <div>
-        Error:
-        {error.message}
+      <div className="has-error" id="shanbay-title">
+        <div className="error-message">请求失败，请登录后刷新本页面</div>
+        <div className="login"><a className="shanbay-btn" href="https://web.shanbay.com/web/account/login/" target="_blank">去登录</a></div>
       </div>
     )
   }
@@ -57,7 +64,7 @@ const DictInfoComponent: React.FC<DictInfoComponentProps> = ({ word }) => {
         <a className="check-detail" href={`https://web.shanbay.com/wordsweb/#/detail/${data?.id}`} target="_blank"> 查看详情 </a>
         <div className="phonetic-symbols">
           {
-            data?.audios.length > 0 && data.audios[0].uk && (
+            data && data.audios && data.audios.length > 0 && data.audios[0].uk && (
               <div>
                 <span>uk: </span>
                 <small>

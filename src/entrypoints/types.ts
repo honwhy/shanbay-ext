@@ -14,6 +14,18 @@ export enum ExAction {
   Lookup = 'Lookup',
 }
 
+export interface ExReponse {
+  data: unknown
+  msg: string
+  status: number
+}
+export interface ExError {
+  data: unknown
+  message: string
+  status: number
+
+}
+
 export type AutoRead = 'en' | 'false' | 'us'
 export type Paraphrase = 'bilingual' | 'Chinese' | 'English'
 export interface ExSettings {

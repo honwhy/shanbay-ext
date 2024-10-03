@@ -4,6 +4,7 @@ import { isEmpty } from 'lodash-es'
 import React, { useEffect } from 'react'
 
 import DictInfo from './DictInfo.tsx'
+import './popover.css'
 
 const WrapperReact: React.FC = () => {
   const [isPopoverOpen, setIsPopoverOpen] = useState(false)
@@ -73,7 +74,6 @@ const WrapperReact: React.FC = () => {
           </PopoverTrigger>
           <PopoverContent>
             <div className="rounded bg-white p-4 shadow-lg">
-              <p>{selectedText}</p>
               <DictInfo word={selectedText} />
             </div>
           </PopoverContent>
