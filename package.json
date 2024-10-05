@@ -1,9 +1,9 @@
 {
-  "name": "wxt-starter",
+  "name": "shanbay-ext",
   "type": "module",
-  "version": "0.0.0",
+  "version": "0.0.1",
   "private": true,
-  "description": "manifest.json description",
+  "description": "基于shanbay网页API查询并加入单词到生词本的应用",
   "scripts": {
     "dev": "wxt",
     "dev:firefox": "wxt -b firefox",

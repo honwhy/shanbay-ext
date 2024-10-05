@@ -1,3 +1,6 @@
+/* eslint-disable perfectionist/sort-imports */
+import './index.css'
+
 import ReactDOM from 'react-dom/client'
 
 import App from './Wrapper.tsx'
