@@ -26,8 +26,8 @@ const WrapperReact: React.FC = () => {
         left: rect.left,
         top: rect.top,
       }
-      debugLogger('info', 'position', position)
-      debugLogger('info', 'selectedText', rangeText)
+      debugLogger('debug', 'position', position)
+      debugLogger('debug', 'selectedText', rangeText)
       setPopoverPosition(position)
     }
     else {

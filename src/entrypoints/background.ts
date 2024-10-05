@@ -37,15 +37,38 @@ async function getAuthInfo() {
   return result[0]
 }
 
-// TODO 后端和前端返回的code需要约定
+interface CheckWordAddedResp {
+  data: {
+    objects: Array<{ exists: boolean | string }>
+  }
+}
 async function lookup(req: ExMessage) {
   const url = `https://apiv3.shanbay.com/abc/words/senses?vocabulary_content=${req.word}`
+  try {
+    const data = await ofetch(url, { credentials: 'include', mode: 'cors', parseResponse: JSON.parse })
+    const data2 = (await checkWordAdded(data.id)) as CheckWordAddedResp
+    data.exists = data2.data.objects[0].exists
+    return { data, msg: 'success', status: 200 }
+  }
+  catch (e) {
+    debugLogger('error', 'lookup error', e)
+    const ee = e as ExError
+    return {
+      data: ee.data,
+      msg: ee.message,
+      status: ee.status,
+    }
+  }
+}
+
+async function checkWordAdded(id: string) {
+  const url = `https://apiv3.shanbay.com/wordscollection/words_check?vocab_ids=${id}`
   try {
     const data = await ofetch(url, { credentials: 'include', mode: 'cors', parseResponse: JSON.parse })
     return { data, msg: 'success', status: 200 }
   }
   catch (e) {
-    debugLogger('error', 'lookup error', e)
+    debugLogger('error', 'checkWordAdded error', e)
     const ee = e as ExError
     return {
       data: ee.data,

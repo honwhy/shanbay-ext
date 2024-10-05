@@ -79,6 +79,8 @@ export interface WordData {
   audios: { uk: Audio, us: Audio }[]
   content: string
   definitions: Definitions
+  // 是否收藏
+  exists: boolean | string
   id: string
   id_int: string
   labels: number[]

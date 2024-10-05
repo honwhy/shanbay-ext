@@ -82,8 +82,18 @@ const DictInfoComponent: React.FC<DictInfoComponentProps> = ({ word }) => {
       ukAudioRef.current.play()
     }
   }
+  const getWordExample = async () => {
+    if (!data || !data.id) return
+    const resp = await browser.runtime.sendMessage({
+      action: ExAction.GetWordExample,
+      id: data.id,
+    }) as ExReponse
+    debugLogger('info', 'getWordExample resp', resp)
+  }
+
+  const { paraphrase, exampleSentence } = settings || {}
   if (loading) {
-    return <div>Loading...</div>
+    return <div>查询中...</div>
   }
 
   if (error) {
@@ -152,7 +162,8 @@ const DictInfoComponent: React.FC<DictInfoComponentProps> = ({ word }) => {
       <div id="shanbay-content">
         <div className="simple-definition">
           {
-            data?.definitions.cn.length
+            paraphrase !== 'English' &&
+            data && data?.definitions.cn.length > 0
             && (
               <div>
                 <b>中文：</b>
@@ -171,10 +182,46 @@ const DictInfoComponent: React.FC<DictInfoComponentProps> = ({ word }) => {
               </div>
             )
           }
+          {
+            paraphrase !== 'Chinese' &&
+            data && data?.definitions.en.length > 0
+            && (
+              <div>
+                <b>英文：</b>
+                {
+                  data.definitions.en.map((p, idx) => (
+                    <div key={`${p.dict_id}_${idx}`}>
+                      <span style={{ color: '#333' }}>
+                        {p.pos}
+                        {' '}
+                      </span>
+                      <span>{p.def}</span>
+                    </div>
+                  ),
+                  )
+                }
+              </div>
+            )
+          }
         </div>
         <div className="hide" id="shanbay-example-sentence-div"></div>
         <div id="shanbay-footer">
-          <span className="hide" id="shanbay-example-sentence-span"><button className="shanbay-btn" id="shanbay-example-sentence-btn">查看例句</button></span>
+          {exampleSentence && 
+            (<span id="shanbay-example-sentence-span">
+              <button className="shanbay-btn" id="shanbay-example-sentence-btn" onClick={getWordExample}>查看例句</button>
+              </span>)
+          }
+          {
+            data && data.exists !== 'error' && (
+              <span id="shanbay-add-word-span">
+                {
+                  data.exists ? 
+                  <button id="shanbay-add-word-btn" className='shanbay-btn forget'>我忘了</button> :
+                  <button id="shanbay-add-word-btn" className='shanbay-btn'>添加</button>
+                }
+              </span>
+            )
+          }
         </div>
       </div>
     </div>
