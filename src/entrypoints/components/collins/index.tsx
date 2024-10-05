@@ -8,28 +8,28 @@ export function checking() {
   let isMounted = false
   // @ts-expect-error app instance
   let root: ReactDOM.Root = null
-  setInterval(() => {
-    debugLogger('info', 'checking')
+  const timerId = setInterval(() => {
+    debugLogger('debug', 'checking')
     const container = document.querySelector('div[class^=\'CollinsTrans_container\']')
     if (isMounted) {
       if (container == null) {
         root?.unmount()
         isMounted = false
       }
+      clearInterval(timerId)
       return
     }
     if (container != null) {
       // 并且collins到期了
       if (container.textContent?.startsWith('你的柯林斯词典到期')) {
-        debugLogger('info', 'collins expired')
+        debugLogger('debug', 'collins expired')
         root = ReactDOM.createRoot(container)
         root.render(<React.StrictMode><Collins /></React.StrictMode>)
-
         isMounted = true
       }
     }
     else {
-      debugLogger('info', 'not mounted')
+      debugLogger('debug', 'not mounted')
       root?.unmount()
       isMounted = false
     }

@@ -14,7 +14,6 @@ interface Explains {
 function parseData(res: string) {
   if (isEmpty(res))
     return
-
   const parser = new DOMParser()
   const doc = parser.parseFromString(res, 'text/html')
   const nodes = doc.querySelectorAll('#collinsResult .wt-container ul>li')
@@ -39,7 +38,7 @@ const CollinsReact: React.FC = () => {
       return
     const word = wordElement.textContent
     browser.runtime.sendMessage(null, { action: ExAction.Collins, word }).then((res: string) => {
-      debugLogger('info', 'collins res', res)
+      debugLogger('debug', 'collins res', res)
       const data = parseData(res) || []
       setExplainList(data)
     })
