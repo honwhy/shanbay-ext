@@ -13,6 +13,8 @@ export default defineConfig({
     permissions: [
       'cookies',
       'storage',
+      'alarms',
+      'notifications',
     ],
   },
   modules: ['@wxt-dev/module-react'],

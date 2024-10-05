@@ -1,9 +1,10 @@
 import { ofetch } from 'ofetch'
 
-import type { ExError, ExMessage } from './types'
+import type { ExError, ExMessage, ExSettings } from './types'
 
+import { decodeDailyTaskResponse } from './decodes'
 import { ExAction } from './types'
-import { debugLogger } from './utils'
+import { debugLogger, devMode } from './utils'
 
 export default defineBackground(() => {
   browser.runtime.onMessage.addListener((req, sender, sendResponse) => {
@@ -112,6 +113,77 @@ async function getWordExample(req: ExMessage) {
   }
   catch (e) {
     debugLogger('error', 'getWordExample error', e)
+    const ee = e as ExError
+    return {
+      data: ee.data,
+      msg: ee.message,
+      status: ee.status,
+    }
+  }
+}
+let settings: null | Partial<ExSettings> = {}
+storage.getItem<ExSettings>(`local:__shanbayExtensionSettings`).then((res) => {
+  settings = res
+})
+const unwatch = storage.watch<ExSettings>(`local:__shanbayExtensionSettings`, (newVal) => {
+  settings = newVal
+  getDailyTask()
+})
+
+browser.runtime.onInstalled.addListener(() => {
+  getDailyTask()
+})
+browser.runtime.onSuspend.addListener(() => {
+  unwatch()
+})
+
+/**
+ * 每3小时检测一下今天的剩余单词数量, 必须登录扇贝之后才可以使用
+ * @function getDailyTask
+ */
+function getDailyTask() {
+  const reminderName = 'remindAlarm'
+  if (settings?.alarm === 'true') {
+    browser.alarms.create(reminderName, {
+      delayInMinutes: devMode ? 1 : 60,
+      periodInMinutes: 180,
+    })
+    browser.alarms.onAlarm.addListener(async () => {
+      if (settings?.alarm === 'false')
+        return browser.alarms.clear(reminderName)
+      debugLogger('log', 'send daily task request')
+      try {
+        const resp = await getDailyTaskCount()
+        debugLogger('log', 'daily task resp', resp)
+        if (resp.status === 200) {
+          const total = resp.data.total
+          if (total === 0) {
+            browser.action.setBadgeText({ text: '' })
+          }
+          else {
+            browser.action.setBadgeText({ text: `${total}` })
+          }
+        }
+      }
+      catch (e: unknown) {
+        debugLogger('error', 'get daily task failed, cause: ', e)
+      }
+    })
+  }
+  else {
+    browser.alarms.clear(reminderName)
+  }
+}
+
+async function getDailyTaskCount() {
+  const url = `https://apiv3.shanbay.com/wordscollection/learning/words/today_learning_items?page=1&type_of=REVIEW&ipp=10`
+  try {
+    const data = await ofetch(url, { credentials: 'include', mode: 'cors', parseResponse: JSON.parse })
+    const result = decodeDailyTaskResponse(data.data)
+    return { data: result, msg: 'success', status: 200 }
+  }
+  catch (e) {
+    debugLogger('error', 'getDailyTaskCount error', e)
     const ee = e as ExError
     return {
       data: ee.data,
