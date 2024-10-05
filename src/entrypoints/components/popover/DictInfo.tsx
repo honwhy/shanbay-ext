@@ -12,7 +12,8 @@ interface DictInfoComponentProps {
 const DictInfoComponent: React.FC<DictInfoComponentProps> = ({ word }) => {
   const [data, setData] = useState<null | WordData>(null)
   const [loading, setLoading] = useState(true)
-  const [error, setError] = useState<boolean | null>(null)
+  const [error, setError] = useState<boolean>(false)
+  const [failed, setFailed] = useState<boolean>(false)
   const ukAudioRef = useRef<HTMLAudioElement>(null)
   const usAudioRef = useRef<HTMLAudioElement>(null)
 
@@ -28,6 +29,9 @@ const DictInfoComponent: React.FC<DictInfoComponentProps> = ({ word }) => {
         const { data, status } = resp
         if (status === 200) {
           setData(data as WordData)
+        }
+        else if (status === 404) {
+          setFailed(true)
         }
         else {
           setError([400, 401, 403].includes(status))
@@ -67,7 +71,13 @@ const DictInfoComponent: React.FC<DictInfoComponentProps> = ({ word }) => {
       </div>
     )
   }
-
+  if (failed) {
+    return (
+      <div className="has-error" id="shanbay-title">
+        <div className="error-message">未查询到单词</div>
+      </div>
+    )
+  }
   return (
     <div id="shanbay-inner">
       <div id="shanbay-title">
