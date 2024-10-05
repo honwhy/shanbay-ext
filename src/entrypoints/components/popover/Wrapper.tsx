@@ -60,15 +60,16 @@ const WrapperReact: React.FC = () => {
         <Popover
           open={isPopoverOpen}
         >
-          <PopoverTrigger style={{
-            left: popoverPosition.left,
-            minHeight: '14px',
-            position: 'fixed',
-            top: popoverPosition.top,
-            visibility: 'hidden',
-            width: 'fit-content',
-            wordBreak: 'keep-all',
-          }}
+          <PopoverTrigger
+            style={{
+              left: popoverPosition.left,
+              minHeight: '14px',
+              position: 'fixed',
+              top: popoverPosition.top,
+              visibility: 'hidden',
+              width: 'fit-content',
+              wordBreak: 'keep-all',
+            }}
           >
             {selectedText}
           </PopoverTrigger>

@@ -13,6 +13,8 @@ const DictInfoComponent: React.FC<DictInfoComponentProps> = ({ word }) => {
   const [data, setData] = useState<null | WordData>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<boolean | null>(null)
+  const ukAudioRef = useRef<HTMLAudioElement>(null)
+  const usAudioRef = useRef<HTMLAudioElement>(null)
 
   useEffect(() => {
     const fetchDataFromApi = async () => {
@@ -22,6 +24,7 @@ const DictInfoComponent: React.FC<DictInfoComponentProps> = ({ word }) => {
           action: ExAction.Lookup,
           word,
         }) as ExReponse
+        debugLogger('info', 'lookup resp', resp)
         const { data, status } = resp
         if (status === 200) {
           setData(data as WordData)
@@ -42,6 +45,16 @@ const DictInfoComponent: React.FC<DictInfoComponentProps> = ({ word }) => {
     fetchDataFromApi()
   }, [word])
 
+  const onPlayUkAudio = () => {
+    if (usAudioRef.current) {
+      usAudioRef.current.play()
+    }
+  }
+  const onPlayUsAudio = () => {
+    if (ukAudioRef.current) {
+      ukAudioRef.current.play()
+    }
+  }
   if (loading) {
     return <div>Loading...</div>
   }
@@ -72,6 +85,28 @@ const DictInfoComponent: React.FC<DictInfoComponentProps> = ({ word }) => {
                   {data.audios[0].uk.ipa}
                   /
                 </small>
+                {data.audios[0].uk.urls.length > 0 && (
+                  <span className="speaker uk" onClick={onPlayUkAudio}>
+                    <audio ref={ukAudioRef} src={data.audios[0].uk.urls[0]} />
+                  </span>
+                )}
+              </div>
+            )
+          }
+          {
+            data && data.audios && data.audios.length > 0 && data.audios[0].us && (
+              <div>
+                <span>us: </span>
+                <small>
+                  /
+                  {data.audios[0].us.ipa}
+                  /
+                </small>
+                {data.audios[0].us.urls.length > 0 && (
+                  <span className="speaker us" onClick={onPlayUsAudio}>
+                    <audio ref={usAudioRef} src={data.audios[0].us.urls[0]} />
+                  </span>
+                )}
               </div>
             )
           }
