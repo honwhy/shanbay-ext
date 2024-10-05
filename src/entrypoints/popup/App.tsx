@@ -36,7 +36,7 @@ function App() {
     <div>
       <h2>扇贝查词插件</h2>
       <ul>
-        <li><a href="https://github.com/honwhy/shanbay-ext">关于插件</a></li>
+        <li><a href="https://shanbay.pages.dev" target="_blank">关于插件</a></li>
         {isLogin
         && (
           <>
