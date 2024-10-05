@@ -1,4 +1,5 @@
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
+import { Toaster } from '@/components/ui/toaster.tsx'
 import { debugLogger } from '@/entrypoints/utils'
 import { isEmpty } from 'lodash-es'
 import React, { useEffect } from 'react'
@@ -56,6 +57,7 @@ const WrapperReact: React.FC = () => {
   }, [])
   return (
     <>
+      <Toaster />
       {isPopoverOpen && (
         <Popover
           open={isPopoverOpen}

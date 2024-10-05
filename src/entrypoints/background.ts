@@ -15,6 +15,10 @@ export default defineBackground(() => {
         return getAuthInfo()
       case ExAction.Lookup:
         return lookup(req)
+      case ExAction.GetWordExample:
+        return getWordExample(req)
+      case ExAction.AddOrForget:
+        return addOrForget(req)
     }
     return true
   })
@@ -69,6 +73,45 @@ async function checkWordAdded(id: string) {
   }
   catch (e) {
     debugLogger('error', 'checkWordAdded error', e)
+    const ee = e as ExError
+    return {
+      data: ee.data,
+      msg: ee.message,
+      status: ee.status,
+    }
+  }
+}
+
+async function addOrForget(req: ExMessage) {
+  const url = `https://apiv3.shanbay.com/news/words`
+  try {
+    const data = await ofetch(
+      url,
+      { body: JSON.stringify({ article_id: '', business_id: 2, paragraph_id: '', sentence_id: '', source_content: '', source_name: '', summary: req.word, vocab_id: req.wordId }), credentials: 'include', headers: {
+        'Content-Type': 'application/json',
+      }, method: 'POST', mode: 'cors', parseResponse: JSON.parse },
+    )
+    return { data, msg: 'success', status: 200 }
+  }
+  catch (e) {
+    debugLogger('error', 'getWordExample error', e)
+    const ee = e as ExError
+    return {
+      data: ee.data,
+      msg: ee.message,
+      status: ee.status,
+    }
+  }
+}
+
+async function getWordExample(req: ExMessage) {
+  const url = `https://apiv3.shanbay.com/abc/words/vocabularies/${req.id}/examples`
+  try {
+    const data = await ofetch(url, { credentials: 'include', mode: 'cors', parseResponse: JSON.parse })
+    return { data, msg: 'success', status: 200 }
+  }
+  catch (e) {
+    debugLogger('error', 'getWordExample error', e)
     const ee = e as ExError
     return {
       data: ee.data,

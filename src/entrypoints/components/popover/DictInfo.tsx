@@ -1,9 +1,9 @@
 // DictInfoComponent.tsx
-import type { ExReponse, ExSettings, WordData } from '@/entrypoints/types'
+import type { ExampleData, ExReponse, ExSettings, WordData } from '@/entrypoints/types'
 
 import { ExAction, AutoRead } from '@/entrypoints/types'
 import { debugLogger } from '@/entrypoints/utils'
-import React, { useEffect, useState } from 'react'
+import React, { Fragment, useEffect, useState } from 'react'
 
 interface DictInfoComponentProps {
   word: string
@@ -17,6 +17,8 @@ const DictInfoComponent: React.FC<DictInfoComponentProps> = ({ word }) => {
   const ukAudioRef = useRef<HTMLAudioElement>(null)
   const usAudioRef = useRef<HTMLAudioElement>(null)
   const [settings, setSettings] = useState<ExSettings | null>(null)
+  const [exampleData, setExampleData] = useState<ExampleData[] | null>(null)
+  const { toast } = useToast()
 
   useEffect(() => {
     const fetchDataFromApi = async () => {
@@ -89,8 +91,33 @@ const DictInfoComponent: React.FC<DictInfoComponentProps> = ({ word }) => {
       id: data.id,
     }) as ExReponse
     debugLogger('info', 'getWordExample resp', resp)
+    const { data: _data, status } = resp
+    if (status === 200) {
+      const exampleData = _data as ExampleData[]
+      if (exampleData.length) {
+        setExampleData(exampleData)
+      }
+    }
   }
-
+  const onAddOrForget = async () => {
+    if (!data ||!data.content || !data.id) return
+    const resp = await browser.runtime.sendMessage({
+      action: ExAction.AddOrForget,
+      word: data.content,
+      wordId: data.id,
+    }) as ExReponse
+    debugLogger('info', 'onAddOrForget resp', resp)
+    const { data: _data, status } = resp
+    if (status === 200) {
+      toast({
+        description: '操作成功',
+      })
+      setData({
+        ...data,
+        exists: !data.exists
+      })
+    }
+  }
   const { paraphrase, exampleSentence } = settings || {}
   if (loading) {
     return <div>查询中...</div>
@@ -204,9 +231,27 @@ const DictInfoComponent: React.FC<DictInfoComponentProps> = ({ word }) => {
             )
           }
         </div>
-        <div className="hide" id="shanbay-example-sentence-div"></div>
+        {
+          exampleData && (
+            <div className="simple-definition" id="shanbay-example-sentence-div">
+              {
+                exampleData.map((item, index) => (
+                  <Fragment key={index}>
+                  <p>{index + 1},
+                    <span dangerouslySetInnerHTML={{ __html: item.content_en.replaceAll('vocab', 'b') }}></span>
+                    <span className="speaker" onClick={() => new Audio(item.audio.us.urls[0]).play()}>
+                      <audio src={item.audio.us.urls[0]}></audio>
+                    </span>
+                  </p>
+                  <p>{item.content_cn}</p>
+                  </Fragment>
+                ))
+              }
+            </div>
+          )
+        }
         <div id="shanbay-footer">
-          {exampleSentence && 
+          {exampleSentence && !exampleData &&
             (<span id="shanbay-example-sentence-span">
               <button className="shanbay-btn" id="shanbay-example-sentence-btn" onClick={getWordExample}>查看例句</button>
               </span>)
@@ -216,8 +261,8 @@ const DictInfoComponent: React.FC<DictInfoComponentProps> = ({ word }) => {
               <span id="shanbay-add-word-span">
                 {
                   data.exists ? 
-                  <button id="shanbay-add-word-btn" className='shanbay-btn forget'>我忘了</button> :
-                  <button id="shanbay-add-word-btn" className='shanbay-btn'>添加</button>
+                  <button id="shanbay-add-word-btn" className='shanbay-btn forget' onClick={onAddOrForget}>我忘了</button> :
+                  <button id="shanbay-add-word-btn" className='shanbay-btn' onClick={onAddOrForget}>添加</button>
                 }
               </span>
             )

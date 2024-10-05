@@ -1,6 +1,7 @@
 // 插件内的通讯
 export interface ExMessage {
   action: string
+  id?: string
   url?: string
   word?: string
   wordId?: string
@@ -55,7 +56,7 @@ export interface ExSettings {
 export default {}
 
 // 单词查询结果
-interface Audio {
+interface Audios {
   ipa: string
   name: string
   sense_id: null | string
@@ -76,7 +77,7 @@ interface Definitions {
 }
 
 export interface WordData {
-  audios: { uk: Audio, us: Audio }[]
+  audios: { uk: Audios, us: Audios }[]
   content: string
   definitions: Definitions
   // 是否收藏
@@ -86,4 +87,12 @@ export interface WordData {
   labels: number[]
   ref_id: string
   vocab_type: string
+}
+
+export interface ExampleData {
+  audio: {
+    us: Audios
+  }
+  content_cn: string
+  content_en: string
 }
