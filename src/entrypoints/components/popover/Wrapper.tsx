@@ -73,7 +73,7 @@ const WrapperReact: React.FC = () => {
           >
             {selectedText}
           </PopoverTrigger>
-          <PopoverContent>
+          <PopoverContent className="__shanbay-popover">
             <div className="rounded bg-white p-4 shadow-lg">
               <DictInfo word={selectedText} />
             </div>

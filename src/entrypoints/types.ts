@@ -26,7 +26,11 @@ export interface ExError {
 
 }
 
-export type AutoRead = 'en' | 'false' | 'us'
+export enum AutoRead {
+  en = 'en',
+  false = 'false',
+  us = 'us',
+}
 export type Paraphrase = 'bilingual' | 'Chinese' | 'English'
 export interface ExSettings {
   // 默认添加到单词本

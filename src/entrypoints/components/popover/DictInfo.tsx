@@ -1,7 +1,7 @@
 // DictInfoComponent.tsx
-import type { ExReponse, WordData } from '@/entrypoints/types'
+import type { ExReponse, ExSettings, WordData } from '@/entrypoints/types'
 
-import { ExAction } from '@/entrypoints/types'
+import { ExAction, AutoRead } from '@/entrypoints/types'
 import { debugLogger } from '@/entrypoints/utils'
 import React, { useEffect, useState } from 'react'
 
@@ -16,6 +16,7 @@ const DictInfoComponent: React.FC<DictInfoComponentProps> = ({ word }) => {
   const [failed, setFailed] = useState<boolean>(false)
   const ukAudioRef = useRef<HTMLAudioElement>(null)
   const usAudioRef = useRef<HTMLAudioElement>(null)
+  const [settings, setSettings] = useState<ExSettings | null>(null)
 
   useEffect(() => {
     const fetchDataFromApi = async () => {
@@ -48,7 +49,29 @@ const DictInfoComponent: React.FC<DictInfoComponentProps> = ({ word }) => {
 
     fetchDataFromApi()
   }, [word])
-
+  // 只执行一次 但是依赖data
+  useEffect(() => {
+    if (settings && data) {
+      const { autoRead } = settings
+      switch(autoRead) {
+        case AutoRead.en:
+          onPlayUkAudio()
+          break
+        case AutoRead.us:
+          onPlayUsAudio()
+          break
+      }
+    }
+  }, [data])
+  useEffect(() => {
+    storage.getItem<ExSettings>(`local:__shanbayExtensionSettings`).then((res) => {
+      setSettings(res)
+    })
+    const unwatch = storage.watch<ExSettings>(`local:__shanbayExtensionSettings`, (newVal) => {
+      setSettings(newVal)
+    })
+    return unwatch
+  }, [])
   const onPlayUkAudio = () => {
     if (usAudioRef.current) {
       usAudioRef.current.play()
@@ -65,16 +88,20 @@ const DictInfoComponent: React.FC<DictInfoComponentProps> = ({ word }) => {
 
   if (error) {
     return (
-      <div className="has-error" id="shanbay-title">
-        <div className="error-message">请求失败，请登录后刷新本页面</div>
-        <div className="login"><a className="shanbay-btn" href="https://web.shanbay.com/web/account/login/" target="_blank">去登录</a></div>
+      <div id="shanbay-inner">
+        <div className="has-error" id="shanbay-title">
+          <div className="error-message">请求失败，请登录后刷新本页面</div>
+          <div className="login"><a className="shanbay-btn" href="https://web.shanbay.com/web/account/login/" target="_blank">去登录</a></div>
+        </div>
       </div>
     )
   }
   if (failed) {
     return (
-      <div className="has-error" id="shanbay-title">
-        <div className="error-message">未查询到单词</div>
+      <div id="shanbay-inner">
+        <div className="has-error" id="shanbay-title">
+          <div className="error-message">未查询到单词</div>
+        </div>
       </div>
     )
   }
