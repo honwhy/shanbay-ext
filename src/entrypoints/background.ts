@@ -1,14 +1,15 @@
+import { decode } from '@/entrypoints/decodes'
 import { ofetch } from 'ofetch'
 
+import type { RootObject } from './dailys'
 import type { ExError, ExMessage, ExSettings } from './types'
 
-import { decodeDailyTaskResponse } from './decodes'
 import { ExAction } from './types'
 import { debugLogger, devMode } from './utils'
 
 export default defineBackground(() => {
   browser.runtime.onMessage.addListener((req, sender, sendResponse) => {
-    debugLogger('debug', 'Received message', req, sender, sendResponse)
+    debugLogger('debug', 'background received message', req, sender, sendResponse)
     switch (req.action) {
       case ExAction.Collins:
         return youdaoQuery(req)
@@ -95,7 +96,7 @@ async function addOrForget(req: ExMessage) {
     return { data, msg: 'success', status: 200 }
   }
   catch (e) {
-    debugLogger('error', 'getWordExample error', e)
+    debugLogger('error', 'addOrForget error', e)
     const ee = e as ExError
     return {
       data: ee.data,
@@ -146,17 +147,16 @@ function getDailyTask() {
   if (settings?.alarm === 'true') {
     browser.alarms.create(reminderName, {
       delayInMinutes: devMode ? 1 : 60,
-      periodInMinutes: 180,
+      periodInMinutes: devMode ? 5 : 180,
     })
     browser.alarms.onAlarm.addListener(async () => {
       if (settings?.alarm === 'false')
         return browser.alarms.clear(reminderName)
-      debugLogger('log', 'send daily task request')
       try {
         const resp = await getDailyTaskCount()
-        debugLogger('log', 'daily task resp', resp)
         if (resp.status === 200) {
-          const total = resp.data.total
+          const json = JSON.parse(resp.data) as RootObject
+          const total = json.total
           if (total === 0) {
             browser.action.setBadgeText({ text: '' })
           }
@@ -179,7 +179,7 @@ async function getDailyTaskCount() {
   const url = `https://apiv3.shanbay.com/wordscollection/learning/words/today_learning_items?page=1&type_of=REVIEW&ipp=10`
   try {
     const data = await ofetch(url, { credentials: 'include', mode: 'cors', parseResponse: JSON.parse })
-    const result = decodeDailyTaskResponse(data.data)
+    const result = decode(data.data)
     return { data: result, msg: 'success', status: 200 }
   }
   catch (e) {

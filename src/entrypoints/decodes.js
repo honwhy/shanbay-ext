@@ -1,263 +1,273 @@
-/* eslint-disable eslint-comments/no-unlimited-disable */
-/* eslint-disable */
-/** 解析每日需要复习单词接口返回的加密字符串。从源码里扒出来的  */
-export function decodeDailyTaskResponse(encryptedString) {
-  const re_btou = new RegExp(['[À-ß][-¿]', '[à-ï][-¿]{2}', '[ð-÷][-¿]{3}'].join('|'), 'g')
-  const fromCharCode = String.fromCharCode
-  const cb_btou = function (t) {
-    switch (t.length) {
-      case 4:
-        const e
-            = (((7 & t.charCodeAt(0)) << 18)
-              | ((63 & t.charCodeAt(1)) << 12)
-              | ((63 & t.charCodeAt(2)) << 6)
-              | (63 & t.charCodeAt(3)))
-              - 65536
-        return (
-          fromCharCode(55296 + (e >>> 10)) + fromCharCode(56320 + (1023 & e))
-        )
-      case 3:
-        return fromCharCode(
-          ((15 & t.charCodeAt(0)) << 12)
-          | ((63 & t.charCodeAt(1)) << 6)
-          | (63 & t.charCodeAt(2)),
-        )
-      default:
-        return fromCharCode(
-          ((31 & t.charCodeAt(0)) << 6) | (63 & t.charCodeAt(1)),
-        )
-    }
+/* eslint-disable perfectionist/sort-classes */
+// eslint-disable-next-line unicorn/prefer-node-protocol
+import { Buffer } from 'buffer'
+
+class Func {
+  static loop(cnt, func) {
+    'v'
+      .repeat(cnt)
+      .split('')
+      .map((_, idx) => func(idx))
   }
-  const btou = t => t.replace(re_btou, cb_btou)
-  const _decode = t => btou(atob(t))
-  const checkVersionI = (string) => {
-    const e = string.charCodeAt()
-    return e >= 65 ? e - 65 : e - 65 + 41
-  }
-  const checkVersion = string =>
-    ((32 * checkVersionI(string[0]) + checkVersionI(string[1]))
-      * checkVersionI(string[2])
-      + checkVersionI(string[3]))
-      % 32
-      <= 1
-  const decode = string =>
-    _decode(
-      String(string)
-        .replace(/[-_]/g, (t) => {
-          return t == '-' ? '+' : '/'
-        })
-        .replace(/[^A-Z0-9+/]/gi, ''),
-    )
+}
 
-  class f {
-    _char = '.'
-    _children = {}
-
-    getChar() {
-      return this._char
-    }
-
-    getChildren() {
-      return this._children
-    }
-
-    setChar(t) {
-      this._char = t
-    }
-
-    setChildren(t, e) {
-      this._children[t] = e
-    }
+class Num {
+  static get(num) {
+    return num >>> 0
   }
 
-  class m {
-    static and(t, e) {
-      return this.get(this.get(t) & this.get(e))
-    }
-
-    static get(t) {
-      return t >>> 0
-    }
-
-    static mod(t, e) {
-      return this.get(this.get(t) % e)
-    }
-
-    static mul(t, e) {
-      const r = ((4294901760 & t) >>> 0) * e
-      const n = (65535 & t) * e
-      return this.get((r >>> 0) + (n >>> 0))
-    }
-
-    static not(t) {
-      return this.get(~this.get(t))
-    }
-
-    static or(t, e) {
-      return this.get(this.get(t) | this.get(e))
-    }
-
-    static shiftLeft(t, e) {
-      return this.get(this.get(t) << e)
-    }
-
-    static shiftRight(t, e) {
-      return this.get(t) >>> e
-    }
-
-    static xor(t, e) {
-      return this.get(this.get(t) ^ this.get(e))
-    }
+  static xor(a, b) {
+    return this.get(this.get(a) ^ this.get(b))
   }
 
-  class n {
-    static loop(number, handler) {
-      return 'v'
-        .repeat(number)
-        .split('')
-        .map((index, val) => handler(val))
-    }
+  static and(a, b) {
+    return this.get(this.get(a) & this.get(b))
   }
 
-  class o {
-    _mat1 = 0
-    _mat2 = 0
-    _status = []
-    _tmat = 0
-
-    _init() {
-      n.loop(7, (t) => {
-        this._status[(t + 1) & 3] = m.xor(
-          this._status[(t + 1) & 3],
-          t
-          + 1
-          + m.mul(
-            1812433253,
-            m.xor(this._status[3 & t], m.shiftRight(this._status[3 & t], 30)),
-          ),
-        )
-      }),
-      (2147483647 & this._status[0]) == 0
-      && this._status[1] === 0
-      && this._status[2] === 0
-      && this._status[3] === 0
-      && ((this._status[0] = 66),
-      (this._status[1] = 65),
-      (this._status[2] = 89),
-      (this._status[3] = 83)),
-      n.loop(8, this._next_state.bind(this))
-    }
-
-    _next_state() {
-      let e = this._status[3]
-      let t = m.xor(
-        m.and(this._status[0], 2147483647),
-        m.xor(this._status[1], this._status[2]),
-      );
-      (t = m.xor(t, m.shiftLeft(t, 1))),
-      (e = m.xor(e, m.xor(m.shiftRight(e, 1), t))),
-      (this._status[0] = this._status[1]),
-      (this._status[1] = this._status[2]),
-      (this._status[2] = m.xor(t, m.shiftLeft(e, 10))),
-      (this._status[3] = e),
-      (this._status[1] = m.xor(
-        this._status[1],
-        m.and(-m.and(e, 1), this._mat1),
-      )),
-      (this._status[2] = m.xor(
-        this._status[2],
-        m.and(-m.and(e, 1), this._mat2),
-      ))
-    }
-
-    generate(t) {
-      this._next_state()
-      let e
-      let r = void 0
-      return (
-        (r = this._status[3]),
-        (e = m.xor(this._status[0], m.shiftRight(this._status[2], 8))),
-        (r = m.xor(r, e)),
-        (r = m.xor(m.and(-m.and(e, 1), this._tmat), r)) % t
-      )
-    }
-
-    seed(e) {
-      n.loop(4, (t) => {
-        e.length > t
-          ? (this._status[t] = m.get(e.charAt(t).charCodeAt()))
-          : (this._status[t] = m.get(110))
-      }),
-      (this._mat1 = this._status[1]),
-      (this._mat2 = this._status[2]),
-      (this._tmat = this._status[3]),
-      this._init()
-    }
+  static mul(a, b) {
+    const high16 = ((a & 0xFFFF0000) >>> 0) * b
+    const low16 = (a & 0x0000FFFF) * b
+    return this.get((high16 >>> 0) + (low16 >>> 0))
   }
 
-  class a {
-    c = [1, 2, 2, 2, 2, 2]
-    s = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ234567'
+  static or(a, b) {
+    return this.get(this.get(a) | this.get(b))
+  }
 
-    constructor() {
-      this._random = new o()
-      this._sign = ''
-      this._inter = {}
-      this._head = new f()
-    }
+  static not(a) {
+    return this.get(~this.get(a))
+  }
 
-    _addSymbol(t, e) {
-      let head = this._head; let o = ''; const r = this
-      return (
-        n.loop(e, (t) => {
-          for (let e = this.s[r._random.generate(32)]; e in head.getChildren() && head.getChildren()[e].getChar() !== '.';)
-            e = r.s[r._random.generate(32)];
-          (o += e),
-          e in head.getChildren() || head.setChildren(e, new f()),
-          (head = head.getChildren()[e])
-        }),
-        head.setChar(t), (this._inter[t] = o)
-      )
-    }
+  static shiftLeft(a, b) {
+    return this.get(this.get(a) << b)
+  }
 
-    decode(t) {
-      for (let e = '', r = 4; r < t.length;) {
-        if (t[r] !== '=') {
-          for (let n = this._head; t[r] in n.getChildren();)
-            (n = n.getChildren()[t[r]]), r++
-          e += n.getChar()
-        }
-        else {
-          (e += '='), r++
-        }
+  static shiftRight(a, b) {
+    return this.get(a) >>> b
+  }
+
+  static mod(a, b) {
+    return this.get(this.get(a) % b)
+  }
+}
+
+const MIN_LOOP = 8
+const PRE_LOOP = 8
+
+const BAY_SH0 = 1
+const BAY_SH1 = 10
+const BAY_SH8 = 8
+const BAY_MASK = 0x7FFFFFFF
+
+class Random {
+  constructor() {
+    this.status = []
+    this.mat1 = 0
+    this.mat2 = 0
+    this.tmat = 0
+  }
+
+  seed(seeds) {
+    Func.loop(4, (idx) => {
+      if (seeds.length > idx) {
+        this.status[idx] = Num.get(seeds.charAt(idx).charCodeAt())
       }
-      return e
+      else {
+        this.status[idx] = Num.get(110)
+      }
+    });
+
+    [, this.mat1, this.mat2, this.tmat] = this.status
+
+    this.init()
+  }
+
+  init() {
+    Func.loop(MIN_LOOP - 1, (idx) => {
+      this.status[(idx + 1) & 3] = Num.xor(
+        this.status[(idx + 1) & 3],
+        idx
+        + 1
+        + Num.mul(
+          1812433253,
+          Num.xor(this.status[idx & 3], Num.shiftRight(this.status[idx & 3], 30)),
+        ),
+      )
+    })
+
+    if (
+      (this.status[0] & BAY_MASK) === 0
+      && this.status[1] === 0
+      && this.status[2] === 0
+      && this.status[3] === 0
+    ) {
+      this.status[0] = 66
+      this.status[1] = 65
+      this.status[2] = 89
+      this.status[3] = 83
     }
 
-    init(string) {
-      this._random.seed(string)
-      this._sign = string
-      n.loop(64, (t) => {
-        this._addSymbol(
-          'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/'[
-            t
-          ],
-          this.c[Number.parseInt((t + 1) / 11)],
-        )
-      })
-      this._inter['='] = '='
+    Func.loop(PRE_LOOP, () => this.nextState())
+  }
+
+  nextState() {
+    let x
+    let y;
+
+    [, , , y] = this.status
+    x = Num.xor(Num.and(this.status[0], BAY_MASK), Num.xor(this.status[1], this.status[2]))
+    x = Num.xor(x, Num.shiftLeft(x, BAY_SH0))
+    y = Num.xor(y, Num.xor(Num.shiftRight(y, BAY_SH0), x));
+    [, this.status[0], this.status[1]] = this.status
+    this.status[2] = Num.xor(x, Num.shiftLeft(y, BAY_SH1))
+    this.status[3] = y
+    this.status[1] = Num.xor(this.status[1], Num.and(-Num.and(y, 1), this.mat1))
+    this.status[2] = Num.xor(this.status[2], Num.and(-Num.and(y, 1), this.mat2))
+  }
+
+  generate(max) {
+    this.nextState()
+
+    let t0;
+
+    [, , , t0] = this.status
+    const t1 = Num.xor(this.status[0], Num.shiftRight(this.status[2], BAY_SH8))
+    t0 = Num.xor(t0, t1)
+    t0 = Num.xor(Num.and(-Num.and(t1, 1), this.tmat), t0)
+
+    return t0 % max
+  }
+}
+
+class Node {
+  constructor() {
+    this.char = '.'
+    this.children = {}
+  }
+
+  getChar() {
+    return this.char
+  }
+
+  getChildren() {
+    return this.children
+  }
+
+  setChar(char) {
+    this.char = char
+  }
+
+  setChildren(k, v) {
+    this.children[k] = v
+  }
+}
+
+const B32_CODE = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ234567'
+const B64_CODE = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/'
+const CNT = [1, 2, 2, 2, 2, 2]
+
+class Tree {
+  constructor() {
+    this.random = new Random()
+    this.sign = ''
+    this.inter = {}
+    this.head = new Node()
+  }
+
+  init(sign) {
+    this.random.seed(sign)
+    this.sign = sign
+
+    Func.loop(64, (i) => {
+      this.addSymbol(B64_CODE[i], CNT[Number.parseInt((i + 1) / 11, 10)])
+    })
+    this.inter['='] = '='
+  }
+
+  addSymbol(char, len) {
+    let ptr = this.head
+    let symbol = ''
+
+    Func.loop(len, () => {
+      let innerChar = B32_CODE[this.random.generate(32)]
+      while (
+        innerChar in ptr.getChildren()
+        && ptr.getChildren()[innerChar].getChar() !== '.'
+      ) {
+        innerChar = B32_CODE[this.random.generate(32)]
+      }
+
+      symbol += innerChar
+      if (!(innerChar in ptr.getChildren())) {
+        ptr.setChildren(innerChar, new Node())
+      }
+
+      ptr = ptr.getChildren()[innerChar]
+    })
+
+    ptr.setChar(char)
+    this.inter[char] = symbol
+    return symbol
+  }
+
+  decode(enc) {
+    let dec = ''
+    for (let i = 4; i < enc.length;) {
+      if (enc[i] === '=') {
+        dec += '='
+        i++
+        continue
+      }
+      let ptr = this.head
+      while (enc[i] in ptr.getChildren()) {
+        ptr = ptr.getChildren()[enc[i]]
+        i++
+      }
+      dec += ptr.getChar()
     }
+
+    return dec
   }
-  if (checkVersion(encryptedString)) {
-    const e = new a()
-    e.init(encryptedString.substr(0, 4))
-    const r = e.decode(encryptedString)
-    return decode(r)
+
+  /* client maybe never use it.
+     encode(ori) {
+     let enc = this.sign;
+     for (let i = 0; i < ori.length; ++i) {
+     enc += this.inter[ori[i]];
+     }
+     return enc;
+     }
+     */
+}
+
+function getIdx(c) {
+  const x = c.charCodeAt()
+  if (x >= 65) {
+    return x - 65
   }
-  else {
-    debugLogger('error', 'Daily task check version failed', encryptedString)
-    return { total: 0 }
+  return x - 65 + 41
+}
+
+const VERSION = 1
+
+function checkVersion(s) {
+  const wi = getIdx(s[0]) * 32 + getIdx(s[1])
+  const x = getIdx(s[2])
+  const check = getIdx(s[3])
+
+  return VERSION >= (wi * x + check) % 32
+}
+
+export function decode(enc) {
+  if (!checkVersion(enc)) {
+    return ''
   }
+
+  const tree = new Tree()
+  tree.init(enc.substr(0, 4))
+  const rawEncode = tree.decode(enc)
+  const buff = Buffer.from(rawEncode, 'base64')
+  return buff.toString('utf8')
 }
 
 export default {}
