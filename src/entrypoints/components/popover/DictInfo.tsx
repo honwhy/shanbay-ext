@@ -51,16 +51,15 @@ const DictInfoComponent: React.FC<DictInfoComponentProps> = ({ word }) => {
 
     fetchDataFromApi()
   }, [word])
-  // 只执行一次 但是依赖data
   useEffect(() => {
     if (settings && data) {
       const { autoRead } = settings
       switch(autoRead) {
         case AutoRead.en:
-          onPlayUkAudio()
+          onPlayAudio(data.audios[0].uk.urls[0])
           break
         case AutoRead.us:
-          onPlayUsAudio()
+          onPlayAudio(data.audios[0].us.urls[0])
           break
       }
     }
@@ -74,15 +73,11 @@ const DictInfoComponent: React.FC<DictInfoComponentProps> = ({ word }) => {
     })
     return unwatch
   }, [])
-  const onPlayUkAudio = () => {
-    if (usAudioRef.current) {
-      usAudioRef.current.play()
-    }
-  }
-  const onPlayUsAudio = () => {
-    if (ukAudioRef.current) {
-      ukAudioRef.current.play()
-    }
+  const onPlayAudio = (url: string) => {
+    browser.runtime.sendMessage({
+      action: ExAction.ForwardAudio,
+      url,
+    })
   }
   const getWordExample = async () => {
     if (!data || !data.id) return
@@ -160,7 +155,7 @@ const DictInfoComponent: React.FC<DictInfoComponentProps> = ({ word }) => {
                   /
                 </small>
                 {data.audios[0].uk.urls.length > 0 && (
-                  <span className="speaker uk" onClick={onPlayUkAudio}>
+                  <span className="speaker uk" onClick={() => onPlayAudio(data.audios[0].uk.urls[0])}>
                     <audio ref={ukAudioRef} src={data.audios[0].uk.urls[0]} />
                   </span>
                 )}
@@ -177,7 +172,7 @@ const DictInfoComponent: React.FC<DictInfoComponentProps> = ({ word }) => {
                   /
                 </small>
                 {data.audios[0].us.urls.length > 0 && (
-                  <span className="speaker us" onClick={onPlayUsAudio}>
+                  <span className="speaker us" onClick={() => onPlayAudio(data.audios[0].us.urls[0])}>
                     <audio ref={usAudioRef} src={data.audios[0].us.urls[0]} />
                   </span>
                 )}
@@ -239,7 +234,7 @@ const DictInfoComponent: React.FC<DictInfoComponentProps> = ({ word }) => {
                   <Fragment key={index}>
                   <p>{index + 1},
                     <span dangerouslySetInnerHTML={{ __html: item.content_en.replaceAll('vocab', 'b') }}></span>
-                    <span className="speaker" onClick={() => new Audio(item.audio.us.urls[0]).play()}>
+                    <span className="speaker" onClick={() => onPlayAudio(item.audio.us.urls[0])}>
                       <audio src={item.audio.us.urls[0]}></audio>
                     </span>
                   </p>

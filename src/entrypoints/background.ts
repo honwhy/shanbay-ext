@@ -24,6 +24,8 @@ export default defineBackground(() => {
         return getWordExample(req)
       case ExAction.AddOrForget:
         return addOrForget(req)
+      case ExAction.ForwardAudio:
+        return forwardAudio(req)
     }
     return true
   })
@@ -72,6 +74,13 @@ export default defineBackground(() => {
         word: info.selectionText?.trim(),
       },
     })
+  })
+
+  // @ts-expect-error: MV3 only API not typed
+  browser.offscreen.createDocument({
+    justification: '<your justification here>',
+    reasons: ['CLIPBOARD'],
+    url: '/offscreen.html',
   })
 })
 
@@ -236,4 +245,14 @@ async function getDailyTaskCount() {
 function isUrlMatchDomain(url: string, domain: string): boolean {
   const regex = new RegExp(`^https?://(www\\.)?${domain}`, 'i')
   return regex.test(url)
+}
+
+async function forwardAudio(req: ExMessage) {
+  const url = req.url
+  if (url) {
+    browser.runtime.sendMessage({
+      action: ExAction.PlayAudio,
+      url,
+    })
+  }
 }

@@ -16,6 +16,7 @@ export default defineConfig({
       'alarms',
       'notifications',
       'contextMenus',
+      'offscreen',
     ],
   },
   modules: ['@wxt-dev/module-react'],

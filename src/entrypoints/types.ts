@@ -11,10 +11,12 @@ export enum ExAction {
   AddOrForget = 'AddOrForget',
   Collins = 'Collins',
   DailyTask = 'DailyTask',
+  ForwardAudio = 'ForwardAudio',
   GetAuthInfo = 'GetAuthInfo',
   GetWordExample = 'GetWordExample',
   Lookup = 'Lookup',
   LookupClicked = 'LookupClicked',
+  PlayAudio = 'PlayAudio',
 }
 
 export interface ExReponse {
