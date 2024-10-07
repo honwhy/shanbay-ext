@@ -162,6 +162,12 @@ function getDailyTask() {
           }
           else {
             browser.action.setBadgeText({ text: `${total}` })
+            browser.notifications.create({
+              iconUrl: browser.runtime.getURL('/icon/128.png'),
+              message: `今日剩余单词数量为${total}，请及时学习！`,
+              title: '扇贝单词学习提醒',
+              type: 'basic',
+            })
           }
         }
       }
