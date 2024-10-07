@@ -4,8 +4,11 @@ import { ofetch } from 'ofetch'
 import type { RootObject } from './dailys'
 import type { ExError, ExMessage, ExSettings } from './types'
 
+import { defaultIgnoreSites } from './constants'
 import { ExAction } from './types'
 import { debugLogger, devMode } from './utils'
+
+let settings: null | Partial<ExSettings> = {}
 
 export default defineBackground(() => {
   browser.runtime.onMessage.addListener((req, sender, sendResponse) => {
@@ -23,6 +26,44 @@ export default defineBackground(() => {
         return addOrForget(req)
     }
     return true
+  })
+  storage.getItem<ExSettings>(`local:__shanbayExtensionSettings`).then((res) => {
+    settings = res
+  })
+  const unwatch = storage.watch<ExSettings>(`local:__shanbayExtensionSettings`, (newVal) => {
+    settings = newVal
+    getDailyTask()
+  })
+
+  browser.runtime.onInstalled.addListener(() => {
+    getDailyTask()
+  })
+  browser.runtime.onSuspend.addListener(() => {
+    unwatch()
+  })
+  browser.runtime.onInstalled.addListener(() => {
+    browser.contextMenus.create({
+      contexts: ['selection'],
+      id: 'shanbay-lookup',
+      title: '在扇贝网中查找 %s',
+    })
+  })
+  browser.contextMenus.onClicked.addListener(async (info, tab) => {
+    debugLogger('debug', 'contextMenus onClicked', info, tab)
+    // ignore sites
+    const url = tab?.url
+    let ignored = false
+    if (defaultIgnoreSites.some(site => isUrlMatchDomain(url!, site)))
+      ignored = true
+    if (settings && settings.ignoreSites && (settings.ignoreSites as string[]).some(site => isUrlMatchDomain(url!, site)))
+      ignored = true
+    browser.tabs.sendMessage(tab!.id!, {
+      action: ExAction.LookupClicked,
+      data: {
+        ignored,
+        word: info.selectionText?.trim(),
+      },
+    })
   })
 })
 
@@ -122,21 +163,6 @@ async function getWordExample(req: ExMessage) {
     }
   }
 }
-let settings: null | Partial<ExSettings> = {}
-storage.getItem<ExSettings>(`local:__shanbayExtensionSettings`).then((res) => {
-  settings = res
-})
-const unwatch = storage.watch<ExSettings>(`local:__shanbayExtensionSettings`, (newVal) => {
-  settings = newVal
-  getDailyTask()
-})
-
-browser.runtime.onInstalled.addListener(() => {
-  getDailyTask()
-})
-browser.runtime.onSuspend.addListener(() => {
-  unwatch()
-})
 
 /**
  * 每3小时检测一下今天的剩余单词数量, 必须登录扇贝之后才可以使用
@@ -147,7 +173,7 @@ function getDailyTask() {
   if (settings?.alarm === 'true') {
     browser.alarms.create(reminderName, {
       delayInMinutes: devMode ? 1 : 60,
-      periodInMinutes: devMode ? 5 : 180,
+      periodInMinutes: devMode ? 10 : 180,
     })
     browser.alarms.onAlarm.addListener(async () => {
       if (settings?.alarm === 'false')
@@ -197,4 +223,9 @@ async function getDailyTaskCount() {
       status: ee.status,
     }
   }
+}
+
+function isUrlMatchDomain(url: string, domain: string): boolean {
+  const regex = new RegExp(`^https?://(www\\.)?${domain}`, 'i')
+  return regex.test(url)
 }

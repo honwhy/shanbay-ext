@@ -1,5 +1,6 @@
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import { Toaster } from '@/components/ui/toaster.tsx'
+import { ExAction } from '@/entrypoints/types.ts'
 import { debugLogger } from '@/entrypoints/utils'
 import { isEmpty } from 'lodash-es'
 import React, { useEffect } from 'react'
@@ -54,6 +55,23 @@ const WrapperReact: React.FC = () => {
     return () => {
       document.removeEventListener('dblclick', pendingSearchSelection)
     }
+  }, [])
+  useEffect(() => {
+    browser.runtime.onMessage.addListener((request) => {
+      debugLogger('debug', 'common content script received message', request)
+      if (request.action === ExAction.LookupClicked) {
+        if (request.data.ignored) {
+          toast({
+            description: '该网页暂不支持查询单词',
+            title: '提示',
+            variant: 'destructive',
+          })
+        }
+        else {
+          pendingSearchSelection()
+        }
+      }
+    })
   }, [])
   return (
     <>

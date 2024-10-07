@@ -14,6 +14,7 @@ export enum ExAction {
   GetAuthInfo = 'GetAuthInfo',
   GetWordExample = 'GetWordExample',
   Lookup = 'Lookup',
+  LookupClicked = 'LookupClicked',
 }
 
 export interface ExReponse {

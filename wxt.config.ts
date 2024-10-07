@@ -15,6 +15,7 @@ export default defineConfig({
       'storage',
       'alarms',
       'notifications',
+      'contextMenus',
     ],
   },
   modules: ['@wxt-dev/module-react'],
