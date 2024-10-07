@@ -53,10 +53,18 @@ export default defineBackground(() => {
     // ignore sites
     const url = tab?.url
     let ignored = false
-    if (defaultIgnoreSites.some(site => isUrlMatchDomain(url!, site)))
+    if (defaultIgnoreSites.some(site => isUrlMatchDomain(url!, site))) {
       ignored = true
-    if (settings && settings.ignoreSites && (settings.ignoreSites as string[]).some(site => isUrlMatchDomain(url!, site)))
+    }
+    else {
+      ignored = false
+    }
+    if (settings && settings.ignoreSites && (settings.ignoreSites as string[]).some(site => isUrlMatchDomain(url!, site))) {
       ignored = true
+    }
+    else {
+      ignored = false
+    }
     browser.tabs.sendMessage(tab!.id!, {
       action: ExAction.LookupClicked,
       data: {
