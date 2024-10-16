@@ -1,0 +1,10 @@
+// ~/web-ext.config.ts
+import { defineRunnerConfig } from 'wxt';
+
+export default defineRunnerConfig({
+  binaries: {
+    chrome: 'D:/Applications/Scoop/apps/googlechrome/current/chrome.exe', // Use Chrome Beta instead of regular Chrome
+    firefox: 'D:/Applications/Scoop/apps/firefox/current/firefox.exe', // Use Firefox Developer Edition instead of regular Firefox
+    edge: '/path/to/edge', // Open MS Edge when running "wxt -b edge"
+  },
+});
