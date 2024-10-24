@@ -4,6 +4,8 @@
   <p align="center">为扇贝网页版提供免费的柯林斯词典，以及基于shanbay网页API查询并加入单词到生词本的应用</p>
 </p>
 
+<a href="https://honwhy.wang/donate" target="_blank"><img src="https://pic1.afdiancdn.com/static/img/welcome/button-sponsorme.png" alt="在为发电支持我" style="height: 40px !important;width: 145px !important;" ></a>
+
 # Shanbay Helper V3
 
 让每个人都能通过学习变得更好
